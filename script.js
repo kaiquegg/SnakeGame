@@ -6,16 +6,20 @@ var col = 25;
 var board;
 var context;
 
-//cabeça da cobra
+//Cobra
 var snakeX = blockSize * 5;
 var snakeY = blockSize * 5;
 
 var velocityX = 0;
 var velocityY = 0;
 
+var snakeBody = [];
+
 //comida
 var foodX = blockSize * 10;
 var foodY = blockSize * 10;
+
+var gameOver = false;
 
 //Preenchimento do tela
 window.onload = function () {
@@ -31,6 +35,9 @@ window.onload = function () {
 };
 
 function update() {
+  if (gameOver) {
+    return;
+  }
   context.fillStyle = "black";
   context.fillRect(0, 0, board.width, board.height);
 
@@ -38,13 +45,43 @@ function update() {
   context.fillRect(foodX, foodY, blockSize, blockSize);
 
   if (snakeX == foodX && snakeY == foodY) {
+    snakeBody.push([foodX, foodY]);
     placeFood();
+  }
+
+  for (let i = snakeBody.length - 1; i > 0; i--) {
+    snakeBody[i] = snakeBody[i - 1];
+  }
+
+  if (snakeBody.length) {
+    snakeBody[0] = [snakeX, snakeY];
   }
 
   context.fillStyle = "lime";
   snakeX += velocityX * blockSize;
   snakeY += velocityY * blockSize;
   context.fillRect(snakeX, snakeY, blockSize, blockSize);
+  for (let i = 0; i < snakeBody.length; i++) {
+    context.fillRect(snakeBody[i][0], snakeBody[i][1], blockSize, blockSize);
+  }
+
+  //Condição de acabar
+  if (
+    snakeX < 0 ||
+    snakeX > col * blockSize ||
+    snakeY < 0 ||
+    snakeY > row * blockSize
+  ) {
+    gameOver = true;
+    alert("Game Over");
+  }
+
+  for (let i = 0; i < snakeBody.length; i++) {
+    if (snakeX == snakeBody[i][0] && snakeY == snakeBody[i][1]) {
+      gameOver = true;
+      alert("Game Over");
+    }
+  }
 }
 
 function changeDirection(e) {
